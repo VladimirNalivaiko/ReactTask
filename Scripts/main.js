@@ -2,7 +2,7 @@
 
 var Rule = function (value) {
     this.value = value;
-    this.functionList = new List();
+    this.functionArray = []
     this.isRequiredFlag = null;
     this.maxLengthFlag = null;
     this.minLengthFlag = null;
@@ -18,7 +18,7 @@ Rule.prototype.setValue = function (value) {
 
 Rule.prototype.isRequired = function () {
     if (!this.isRequiredFlag) {
-        this.functionList.append(this.isRequired);
+        this.functionArray.push(this.isRequired);
         this.isRequiredFlag = true;
         return this;
     }
@@ -34,7 +34,7 @@ Rule.prototype.min = function (value) {
     var a = this.value;
     var b = this.minFlag;
     if (!this.minFlag) {
-        this.functionList.append(this.min);
+        this.functionArray.push(this.min);
         this.minFlag = value;
         return this;
     }
@@ -50,7 +50,7 @@ Rule.prototype.max = function (value) {
     var a = this.value;
     var b = this.maxFlag;
     if (!this.maxFlag) {
-        this.functionList.append(this.max);
+        this.functionArray.push(this.max);
         this.maxFlag = value;
         return this;
     }
@@ -66,7 +66,7 @@ Rule.prototype.maxLength = function (value) {
     var a = this.value;
     var b = this.maxLengthFlag;
     if (!this.maxLengthFlag) {
-        this.functionList.append(this.maxLength);
+        this.functionArray.push(this.maxLength);
         this.maxLengthFlag = value;
         return this;
     }
@@ -81,7 +81,7 @@ Rule.prototype.minLength = function (value) {
     var a = this.value;
     var b = this.minLengthFlag;
     if (!this.minLengthFlag) {
-        this.functionList.append(this.minLength);
+        this.functionArray.push(this.minLength);
         this.minLengthFlag = value;
         return this;
     }
@@ -95,7 +95,7 @@ Rule.prototype.minLength = function (value) {
 Rule.prototype.isInt = function () {
     var a = this.value;
     if (!this.isIntFlag) {
-        this.functionList.append(this.isInt);
+        this.functionArray.push(this.isInt);
         this.isIntFlag = true;
         return this;
     }
@@ -109,7 +109,7 @@ Rule.prototype.isInt = function () {
 Rule.prototype.isEmail = function () {
     var a = this.value;
     if (!this.isEmailFlag) {
-        this.functionList.append(this.isEmail);
+        this.functionArray.push(this.isEmail);
         this.isEmailFlag = true;
         return this;
     }
@@ -133,8 +133,8 @@ Validator.validate = function (obj, rules) {
     }
     for (var i = 0; i < properties.length; i++) {
         var rule = rules[properties[i]];
-        for (var j = 0; j < rule.functionList.length; j++) {
-            var result = rule.functionList.at(j).data.call(rule);
+        for (var j = 0; j < rule.functionArray.length; j++) {
+            var result = rule.functionArray[j].call(rule);
             if (!result.value) {
                 return new Promise((resolve, reject) => {
                     reject(result.error);
