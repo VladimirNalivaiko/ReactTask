@@ -2,14 +2,7 @@
 
 var Rule = function (value) {
     this.value = value;
-    this.functionArray = []
-    this.isRequiredFlag = null;
-    this.maxLengthFlag = null;
-    this.minLengthFlag = null;
-    this.maxFlag = null;
-    this.minFlag = null;
-    this.isEmailFlag = null;
-    this.isIntFlag = null;
+    this.functionArray = [];
 }
 
 Rule.prototype.setValue = function (value) {
@@ -17,108 +10,99 @@ Rule.prototype.setValue = function (value) {
 }
 
 Rule.prototype.isRequired = function () {
-    if (!this.isRequiredFlag) {
-        this.functionArray.push(this.isRequired);
-        this.isRequiredFlag = true;
-        return this;
-    }
-    var a = this.value;
-    var ruleResult = {
-        error : "Value must be different from " + a,
-        value : a ? true : false
-    }
-    return ruleResult;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var ruleResult = {
+                error: "Value must be different from " + ruleValue,
+                value: ruleValue ? true : false
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 Rule.prototype.min = function (value) {
-    var a = this.value;
-    var b = this.minFlag;
-    if (!this.minFlag) {
-        this.functionArray.push(this.min);
-        this.minFlag = value;
-        return this;
-    }
-    
-    var ruleResult = {
-        error : "Value must be greater than " + b,
-        value : a >= b ? true : false
-    }
-    return ruleResult;
+    var parametr = value;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var ruleResult = {
+                error: "Value must be greater than " + parametr,
+                value: ruleValue >= parametr ? true : false
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 Rule.prototype.max = function (value) {
-    var a = this.value;
-    var b = this.maxFlag;
-    if (!this.maxFlag) {
-        this.functionArray.push(this.max);
-        this.maxFlag = value;
-        return this;
-    }
-    
-    var ruleResult = {
-        error : "Value must be less than " + b,
-        value : a <= b ? true : false
-    }
-    return ruleResult;
+    var parametr = value;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var ruleResult = {
+                error: "Value must be less than " + parametr,
+                value: ruleValue <= parametr ? true : false
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 Rule.prototype.maxLength = function (value) {
-    var a = this.value;
-    var b = this.maxLengthFlag;
-    if (!this.maxLengthFlag) {
-        this.functionArray.push(this.maxLength);
-        this.maxLengthFlag = value;
-        return this;
-    }
-    var ruleResult = {
-        error : "Length must be less than " + b,
-        value : a.length <= b ? true : false
-    }
-    return ruleResult;
+    var parametr = value;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var ruleResult = {
+                error: "Length must be less than " + parametr,
+                value: ruleValue.length <= parametr ? true : false
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 Rule.prototype.minLength = function (value) {
-    var a = this.value;
-    var b = this.minLengthFlag;
-    if (!this.minLengthFlag) {
-        this.functionArray.push(this.minLength);
-        this.minLengthFlag = value;
-        return this;
-    }
-    var ruleResult = {
-        error : "Length must be greater than " + b,
-        value : a.length >= b ? true : false
-    }
-    return ruleResult;
+    var parametr = value;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var ruleResult = {
+                error: "Length must be greater than " + parametr,
+                value: ruleValue.length >= parametr ? true : false
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 Rule.prototype.isInt = function () {
-    var a = this.value;
-    if (!this.isIntFlag) {
-        this.functionArray.push(this.isInt);
-        this.isIntFlag = true;
-        return this;
-    }
-    var ruleResult = {
-        error : "It nust be a number",
-        value : !isNaN(parseFloat(a)) && isFinite(a)
-    }
-    return ruleResult;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var ruleResult = {
+                error: "It nust be a number",
+                value: !isNaN(parseFloat(ruleValue) && isFinite(ruleValue))
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 Rule.prototype.isEmail = function () {
-    var a = this.value;
-    if (!this.isEmailFlag) {
-        this.functionArray.push(this.isEmail);
-        this.isEmailFlag = true;
-        return this;
-    }
-    var emailReg = /^[a-z][a-zA-Z0-9_.]*(\.[a-zA-Z][a-zA-Z0-9_.]*)?@[a-z][a-zA-Z0-9]*\.[a-z]+(\.[a-z]+)?$/;
-    var ruleResult = {
-        error : "It must be an email",
-        value : emailReg.test(a)
-    }
-    return ruleResult;
+    this.functionArray.push(
+        (function (ruleValue) {
+            var emailReg = /^[a-z][a-zA-Z0-9_.]*(\.[a-zA-Z][a-zA-Z0-9_.]*)?@[a-z][a-zA-Z0-9]*\.[a-z]+(\.[a-z]+)?$/;
+            var ruleResult = {
+                error: "It must be an email",
+                value: emailReg.test(ruleValue)
+            }
+            return ruleResult;
+        })
+    );
+    return this;
 }
 
 var Validator = function () {
@@ -134,7 +118,7 @@ Validator.validate = function (obj, rules) {
     for (var i = 0; i < properties.length; i++) {
         var rule = rules[properties[i]];
         for (var j = 0; j < rule.functionArray.length; j++) {
-            var result = rule.functionArray[j].call(rule);
+            var result = rule.functionArray[j].call(rule, rules[propToRule[i]].value);
             if (!result.value) {
                 return new Promise((resolve, reject) => {
                     reject(result.error);
@@ -170,21 +154,21 @@ var loginValidationRules = {
     email: new Rule().isRequired().minLength(6).isEmail()
 };
 
-var validationPromise1 = Validator.validate(person1, personValidationRules)
-    .then(
-    result => {
-        console.log(result)
-    },
-    error => {
-        console.log(error)
-    }
+Promise.prototype.checkPromise = function () {
+    this.then(
+        result => {
+            console.log(result)
+        },
+        error => {
+            console.log(error)
+        }
     )
+}
 
-
-
-// var validationPromise2 = Validator.validate(person2, personValidationRules);
-// var validationPromise3 = Validator.validate(login, loginValidationRules);
-// console.log("person1 validate = " + validationPromise1);
-// console.log("person2 validate = " + validationPromise2);
-// console.log("login validate = " + validationPromise3);
+var validationPromise1 = Validator.validate(person1, personValidationRules);
+var validationPromise2 = Validator.validate(person2, personValidationRules);
+var validationPromise3 = Validator.validate(login, loginValidationRules);
+validationPromise1.checkPromise();
+validationPromise2.checkPromise();
+validationPromise3.checkPromise();
 
